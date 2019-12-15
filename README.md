@@ -40,7 +40,7 @@ These commands will install `my-cli` and all of its subcommands into `/usr/local
 $ my-cli --install
 ````
 
-You can also use it to uninstall `magic-cli`:
+You can also use it to uninstall `my-cli`:
 
 ````bash
 $ my-cli --uninstall
