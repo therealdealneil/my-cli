@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+filename=$(basename -- "$0")
+prefix=$filename-
+directory="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+fetch_commands()
+{
+    command_list=($(ls $directory/$prefix* 2> /dev/null))
+}
+
+list_commands()
+{
+    max_length=0
+    command_output=""
+    
+    for command in "${command_list[@]}"
+    do
+        description=$(sed -n '2 s/[ \t]*#[ \t]*//p' $command)
+        parameters=$(sed -n '/@param/s/[ \t]*#[ \t]*@param[ \t]*//gp' $command | sed -n 's/[ \t]*-[ \t].*//gp' | sed 's/^$/<param>/')
+        
+        subcommand=$(basename $command)
+        subcommand=${subcommand#"$prefix"}
+        full_command="$subcommand $parameters"
+        
+        len=${#full_command}
+        [[ $len > $max_length ]] && max_length=$len
+        command_output+="$full_command|$description\n"
+    done
+
+    echo -e $command_output | awk -v pad=$max_length -F'|' '{ printf "   %-*s   %s\n", pad, $1, $2 }'
+}
+
+command=$1
+
+if [ -z $command ] || [ $command == '--help' ] || [ $command == '-h' ]
+then
+    echo "usage: $filename <command> [<args>]"
+    echo ""
+
+    fetch_commands
+
+    if [ -z "$command_list" ]
+    then
+        echo 'Hrm, there are no commands for me to run.'
+        echo "I can run any executables in $directory which have filenames that start with $prefix."
+    else
+        # Print All Commands
+        echo 'Commands:'
+        list_commands
+    fi
+
+    exit
+elif [ $command == '--list' ] || [ $command == '-l' ]
+then
+    fetch_commands
+    list_commands
+    exit
+elif [ $command == '--install' ]
+then
+    FILES="${filename} ${prefix}*"
+    install -p -m 755 ${FILES} /usr/local/bin
+    echo "OK, ${filename} command line tools have been installed. 🎉  Here's what's available:" && ${filename} --list
+    exit
+elif [ $command == '--uninstall' ]
+then
+    FILES="${filename} ${prefix}*"
+    cd /usr/local/bin && rm ${FILES}
+    exit
+elif [ $command == '--update' ]
+then
+    # TODO: Implement update
+    echo "Not implemented yet."
+    exit
+fi
+
+# Execute command
+file=$directory/$prefix$command
+if [ ! -f $file ]
+then
+    echo "I don't know how to $command. :("
+    exit
+fi
+
+$file ${@:2}
