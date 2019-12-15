@@ -34,7 +34,7 @@ You can also define any extra parameters that are required for the script with a
 ````
 
 ## Installation
-This repository includes a Makefile that will install `my-cli` and all of its subcommands into `/usr/local/bin`:
+These commands will install `my-cli` and all of its subcommands into `/usr/local/bin`:
 
 ````bash
 $ my-cli --install
