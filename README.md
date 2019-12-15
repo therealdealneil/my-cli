@@ -1,8 +1,8 @@
 # my-cli
 
-This is a fork of the original magic-cli project, rewritten to pure Bash. The original project, while an excellent
+_This is a fork of the original magic-cli project, rewritten to pure Bash. The original project, while an excellent
 concept, was written in Ruby. I wanted a pure Bash solution instead, as I didn't want to force a dependency on Ruby
-to use it.
+to use it._
 
 **A foundation for building your own suite of command line tools.**
 
